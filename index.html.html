@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HomePro360</title>
+<meta name="theme-color" content="#1E5BD8">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="HomePro">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#F4F6FB;--sf:#fff;--tx:#1F2A44;--tx2:#6B7694;--pr:#1E5BD8;--ac:#1E5BD8;--gn:#3DB36B;--ok:#1FA971;--rd:#E5484D;--bd:#E3E7EF;--fl:#0E9AA7;--chip:#EEF2FF}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1220;--sf:#171C2E;--tx:#EEF1F8;--tx2:#9AA4BA;--bd:#2A3150;--pr:#7B97FF;--ac:#4C7DF0;--chip:#222A4A}}
+:root[data-theme="dark"]{--bg:#0E1220;--sf:#171C2E;--tx:#EEF1F8;--tx2:#9AA4BA;--bd:#2A3150;--pr:#7B97FF;--ac:#4C7DF0;--chip:#222A4A}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:border-box}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--tx);font:15px/1.45 Nunito,system-ui,-apple-system,"Segoe UI",sans-serif}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.app{max-width:430px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;background:var(--bg)}
+@media(min-width:600px){.app{margin:16px auto;min-height:calc(100dvh - 32px);border:1px solid var(--bd);border-radius:28px;overflow:hidden}}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:var(--sf);border-bottom:1px solid var(--bd)}
+.logo{font:700 20px Nunito,system-ui,sans-serif;color:var(--pr)}
+.tag{font-size:12px;color:var(--tx2);background:var(--chip);padding:3px 10px;border-radius:99px}
+main{flex:1;padding:18px;overflow-x:hidden}
+h1{font:700 24px/1.2 Nunito,system-ui,sans-serif;margin:0 0 14px}
+h2{font:600 17px Nunito,system-ui,sans-serif;margin:20px 0 10px}
+.sub{color:var(--tx2);font-size:13px}
+.urg{width:100%;border:0;border-radius:18px;padding:16px;background:var(--rd);color:#fff;font:700 18px Nunito,system-ui,sans-serif;text-align:left;display:flex;flex-direction:column;gap:2px;margin-bottom:14px}
+.urg small{font:400 13px Nunito,sans-serif;opacity:.9}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{background:var(--sf);border:1px solid var(--bd);border-top:4px solid var(--c);border-radius:14px;padding:12px 8px;text-align:left;display:flex;flex-direction:column;gap:4px;font-size:22px}
+.tile b{font:600 14px Nunito,sans-serif}.tile small{font-size:11px;color:var(--tx2);line-height:1.3}
+.card{background:var(--sf);border:0;box-shadow:0 6px 18px rgba(31,42,68,.08);border-radius:18px;padding:14px;margin-bottom:12px;width:100%;text-align:left;display:block}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:99px;background:var(--chip);color:var(--pr);margin:6px 4px 0 0}
+.price{font-weight:600;font-variant-numeric:tabular-nums}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chip{border:1px solid var(--bd);background:var(--sf);border-radius:99px;padding:8px 14px}
+.chip.on{background:var(--pr);color:#fff;border-color:var(--pr)}
+.btn{width:100%;border:0;border-radius:14px;padding:14px;background:var(--ac);color:#fff;font-weight:600;font-size:16px;margin-top:8px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.alt{background:var(--chip);color:var(--pr)}
+.back{border:0;background:none;color:var(--pr);padding:0 0 10px;font-weight:500}
+.line{display:flex;justify-content:space-between;padding:4px 0;font-size:14px}
+.line.t{border-top:1px solid var(--bd);margin-top:6px;padding-top:10px;font-weight:600;font-size:16px}
+.step{display:flex;gap:12px;align-items:center;padding:8px 0;color:var(--tx2)}
+.dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--bd);flex:none}
+.step.done{color:var(--tx)}.step.done .dot{background:var(--ok);border-color:var(--ok)}
+.step.cur{color:var(--tx);font-weight:600}.step.cur .dot{border-color:var(--ac);background:var(--ac)}
+.pill{display:inline-block;padding:4px 10px;border-radius:99px;font-size:12px;font-weight:600}
+.hold{background:#FFF1E3;color:#B45309}.rel{background:#DDF6EA;color:#0F7A4F}
+input[type=range]{width:100%;accent-color:var(--ac)}
+.stp{display:flex;align-items:center;gap:14px}.stp button{width:36px;height:36px;border-radius:50%;border:1px solid var(--bd);background:var(--sf);font-size:18px}
+.stars button{border:0;background:none;font-size:30px;color:#C9CFDB;padding:0 2px}.stars button.on{color:#F5B301}
+nav{position:sticky;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);background:var(--sf);box-shadow:0 -4px 16px rgba(31,42,68,.06)}
+nav button{border:0;background:none;padding:9px 0 8px;font-size:11px;color:var(--tx2);display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button span{font-size:19px}nav button.on{color:var(--pr);font-weight:600}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90%;text-align:center;z-index:9}
+#toast.show{opacity:1}
+@media(prefers-reduced-motion:reduce){#toast{transition:none}}
+
+header{background:transparent;border:0;padding:16px 18px 4px}
+.logo{display:flex;align-items:center;gap:8px;font:800 26px Nunito,system-ui,sans-serif;color:var(--tx);letter-spacing:-.5px}
+.logo i{font-style:normal;color:var(--gn)}
+.hic{display:flex;align-items:center;gap:12px;font-size:22px}
+.av{width:40px;height:40px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-size:20px}
+.hi{font:700 20px Nunito,system-ui,sans-serif;margin:14px 0}
+.search{width:100%;border:0;border-radius:16px;padding:15px 18px 15px 48px;color:var(--tx);font:inherit;box-shadow:0 6px 18px rgba(31,42,68,.08);background:var(--sf) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' fill='none' stroke='%236B7694' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='9' cy='9' r='6'/%3E%3Cpath d='m14 14 6 6'/%3E%3C/svg%3E") no-repeat 16px center}
+.big{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}
+.bc{background:var(--sf);border:0;border-radius:16px;box-shadow:0 6px 18px rgba(31,42,68,.1);padding:0 0 12px;text-align:left;overflow:hidden}
+.ci svg{display:block;width:100%;height:auto}
+.bc b{display:block;padding:10px 10px 6px;font-size:14px;line-height:1.2}
+.bc small{display:block;margin:0 10px;padding-top:6px;border-top:1px solid var(--bd);font-size:12px;color:var(--tx2);line-height:1.3}
+.qt{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.qt .card{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;font-size:24px;padding:16px 4px;margin:0}
+.qt span{font-size:14px;font-weight:600}
+.cat{display:flex;gap:0;align-items:center;padding:0;overflow:hidden}
+.cat .ci{width:110px;flex:none}.cat>div:last-child{padding:12px}
+
+header>.ib:first-child{min-width:76px;text-align:left}
+.ib{border:0;background:none;font-size:22px;color:var(--tx);padding:4px 8px;min-width:38px}
+.hr{display:flex;min-width:76px;justify-content:flex-end}
+.fl{display:flex;gap:8px;overflow-x:auto;margin:6px -18px 8px;padding:4px 18px 10px}
+.fl .chip{white-space:nowrap;margin:0;box-shadow:0 3px 10px rgba(31,42,68,.08);border:0}
+.pc{display:flex;padding:0;overflow:hidden;align-items:stretch}
+.pc .th{width:104px;flex:none}.pc .th svg{width:100%;height:100%;display:block}
+.bd2{padding:12px;flex:1}
+.ok2,.wn,.gr{display:inline-block;border-radius:8px;padding:2px 8px;font-size:13px;margin:4px 0}
+.ok2{background:#E4F6EA;color:#12803F}.wn{background:#FFEBDD;color:#C2410C}.gr{background:var(--chip);color:var(--tx2)}
+.sg{color:#F5B301;letter-spacing:1px}
+.hero{margin:-18px -18px 14px}.hero svg{display:block;width:100%;height:210px}
+.qg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fld{display:flex;align-items:center;gap:8px;background:var(--sf);border-radius:12px;padding:10px 12px;box-shadow:0 3px 10px rgba(31,42,68,.08);margin-bottom:10px}
+.fld select,.fld input,.fld textarea{border:0;background:transparent;font:inherit;color:var(--tx);flex:1;min-width:0;outline:none;resize:none}
+.fld span{color:var(--tx2)}
+.rv{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--bd)}
+.rav{width:40px;height:40px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-weight:700;color:var(--pr);flex:none}
+.cf{background:#E8F7EE;box-shadow:none}
+.s3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
+.s3 .card{margin:0;padding:12px;display:flex;flex-direction:column;gap:4px}.s3 b{font-size:22px}
+.bell{position:relative}.bell i{position:absolute;top:-6px;right:-8px;background:var(--rd);color:#fff;font:700 11px Nunito,sans-serif;border-radius:99px;padding:1px 6px;font-style:normal}
+.bars{display:flex;gap:8px;align-items:flex-end;height:110px}.bars div{flex:1;background:var(--pr);border-radius:6px 6px 0 0}
+.tk{display:flex;gap:10px;align-items:center;padding:8px 0}
+</style>
+</head>
+<body>
+<div class="app">
+<header></header>
+<main id="main"></main>
+<nav id="nav"></nav>
+</div>
+<div id="toast" role="status"></div>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,sendPasswordResetEmail} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc,updateDoc,addDoc,deleteDoc,collection,query,where,onSnapshot,getDocs,runTransaction,writeBatch,serverTimestamp,deleteField} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+// 1) Pegá acá la configuración de tu proyecto Firebase (Configuración del proyecto > Tus apps > Web)
+const firebaseConfig={// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCGmPIAcuY-WwNxPEBHelTYOE3TEoVg4fI",
+  authDomain: "homepro-9b0d8.firebaseapp.com",
+  projectId: "homepro-9b0d8",
+  storageBucket: "homepro-9b0d8.firebasestorage.app",
+  messagingSenderId: "411718341624",
+  appId: "1:411718341624:web:3f350041ed43c69253fc0d"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);};
+
+const $=s=>document.querySelector(s);
+const esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const m=n=>'$ '+Math.round(n).toLocaleString('es-AR');
+const fmt=s=>new Date(s).toLocaleString('es-AR',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+const nowL=()=>new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);
+const st=n=>'★'.repeat(Math.round(n))+'☆'.repeat(5-Math.round(n));
+const EST=['confirmada','en_camino','en_ejecucion','finalizada','cerrada'];
+const LBL={confirmada:'Confirmada',en_camino:'Prestador en camino',en_ejecucion:'En ejecución',finalizada:'Trabajo finalizado',cerrada:'Cerrada',cancelada:'Cancelada'};
+const RUB=['Plomería','Electricidad','Gas','Albañilería','Mantenimiento'];
+const NAV={cliente:[['svc','🏠','Servicios'],['ords','📅','Agenda'],['perfil','👤','Perfil']],prestador:[['pag','📅','Agenda'],['pturn','🕘','Turnos'],['perfil','👤','Perfil']],admin:[['adm','✅','Prestadores'],['perfil','👤','Perfil']]};
+const HOME={cliente:'svc',prestador:'pag',admin:'adm'};
+const LG='<span class="logo"><svg width="36" height="32" viewBox="0 0 34 30" aria-hidden="true"><path d="M17 2 2 14h4v13h22V14h4z" fill="#1E5BD8"/><rect x="11" y="16" width="12" height="11" rx="2" fill="#3DB36B"/></svg><span>HomePro<i>360</i></span></span>';
+const S={view:'load',tab:'login',rol:'cliente',orders:[],pres:[],revs:[],rat:{},pend:[],slots:[],myslots:[],me:null,mp:null};
+const errMsg=e=>({'auth/email-already-in-use':'Ese email ya está registrado','auth/invalid-credential':'Email o contraseña incorrectos','auth/invalid-email':'El email no es válido','auth/weak-password':'La contraseña debe tener al menos 6 caracteres','permission-denied':'No tenés permiso para esa acción'}[e.code]||e.message);
+const avg=id=>{const a=S.rat[id];return a?a.reduce((x,y)=>x+y,0)/a.length:0};
+const ord=()=>S.orders.find(o=>o.id===S.oid);
+let unsub=[],unslots=null,app,auth,db;
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2600)}
+function go(v,x){Object.assign(S,x||{});S.view=v;render()}
+
+const ocard=o=>`<button class="card" data-a="ord" data-id="${o.id}"><div class="row"><b>${esc(o.rubro)} · ${esc(S.me.role==='cliente'?o.prestadorNombre:o.clienteNombre)}</b><span class="pill ${o.estado==='cerrada'?'rel':'hold'}">${LBL[o.estado]}</span></div><div class="sub">${fmt(o.inicio)} · ${esc(o.direccion)}</div></button>`;
+const fld=(k,ph,t)=>`<label class="fld"><input ${t?'type="'+t+'"':''} data-m="${k}" placeholder="${ph}" aria-label="${ph}" value="${esc(S[k])}"></label>`;
+
+const V={
+load:()=>'<p class="sub">Cargando…</p>',
+setup:()=>'<h1>Falta configurar Firebase</h1><p class="sub">Abrí index.html y reemplazá los valores de firebaseConfig por los de tu proyecto HomePro. Los pasos están en el README.</p>',
+auth:()=>{const r=S.tab==='reg',p=S.rol==='prestador';
+ return `<h1>${r?'Crear cuenta':'Ingresar'}</h1><div class="chips"><button class="chip ${!r?'on':''}" data-a="tab" data-v="login">Ingresar</button><button class="chip ${r?'on':''}" data-a="tab" data-v="reg">Registrarme</button></div>`+
+ (r?fld('nom','Nombre y apellido'):'')+fld('em','Email','email')+`<label class="fld"><input type="password" data-m="pw" placeholder="Contraseña (mínimo 6)" aria-label="Contraseña" value="${esc(S.pw)}"></label>`+
+ (r?`<div class="chips"><button class="chip ${!p?'on':''}" data-a="rol" data-v="cliente">Soy cliente</button><button class="chip ${p?'on':''}" data-a="rol" data-v="prestador">Soy prestador</button></div>`+
+  (p?`<label class="fld"><select data-m="rub" aria-label="Rubro">${RUB.map(x=>`<option ${x===(S.rub||RUB[0])?'selected':''}>${x}</option>`).join('')}</select></label>`+fld('zona','Zona de trabajo (ej. Palermo, CABA)')+fld('desde','Precio de visita desde ($)','number')+`<label class="fld"><textarea rows="2" data-m="desc" placeholder="Describí tu servicio" aria-label="Descripción">${esc(S.desc)}</textarea></label><p class="sub">Revisamos tu perfil antes de mostrarlo en el listado.</p>`:''):'')+
+ `<button class="btn" data-a="${r?'reg':'login'}">${r?'Crear cuenta':'Ingresar'}</button>`+(r?'':'<button class="btn alt" data-a="reset">Olvidé mi contraseña</button>');
+},
+svc:()=>{const l=S.pres.filter(p=>!S.rf||p.rubro===S.rf);
+ return `<h1>Servicios del hogar</h1><div class="fl">${RUB.map(r=>`<button class="chip ${S.rf===r?'on':''}" data-a="rf" data-v="${r}">${r}</button>`).join('')}</div>`+
+ (l.length?l.map(p=>`<button class="card" data-a="det" data-id="${p.id}"><div class="row"><b>${esc(p.nombre)}</b><span class="sg">${avg(p.id)?st(avg(p.id)):''}</span></div><div class="sub">${esc(p.rubro)} · ${esc(p.zona)}</div><div class="price" style="margin-top:6px">Visita desde ${m(p.desde)}</div><div class="sub">${S.rat[p.id]?S.rat[p.id].length+' opiniones':'Nuevo en HomePro'}</div></button>`).join(''):'<p class="sub">Todavía no hay prestadores aprobados en esta categoría.</p>');
+},
+det:()=>{const p=S.pres.find(x=>x.id===S.pid);if(!p)return '<p class="sub">Prestador no encontrado.</p>';
+ const rv=S.revs.filter(x=>x.prestadorId===p.id);
+ return `<button class="back" data-a="go" data-v="svc">‹ Volver</button><h1>${esc(p.nombre)}</h1><p class="sub">${esc(p.rubro)} · ${esc(p.zona)} · Visita desde ${m(p.desde)}</p><p>${esc(p.desc)}</p>`+
+ `<h2>Turnos disponibles</h2><div class="chips" id="slots"></div>`+fld('dir','Dirección del trabajo')+`<label class="fld"><textarea rows="2" data-m="nt" placeholder="Notas (opcional)" aria-label="Notas">${esc(S.nt)}</textarea></label>`+
+ `<button class="btn" data-a="book">Confirmar reserva</button><p class="sub" style="text-align:center">El pago se coordina directamente con el prestador. Pronto: pago seguro dentro de la app.</p>`+
+ `<h2>Opiniones de clientes</h2>`+(rv.length?rv.map(r=>`<div class="rv"><span class="rav">★</span><div><span class="sg">${st(r.estrellas)}</span><div class="sub">${esc(r.texto)||'Sin comentario'}</div></div></div>`).join(''):'<p class="sub">Todavía no tiene opiniones.</p>');
+},
+ords:()=>{const l=S.orders.slice().sort((a,b)=>a.inicio<b.inicio?1:-1);return '<h1>Agenda y reservas</h1>'+(l.length?l.map(ocard).join(''):'<p class="sub">Todavía no tenés reservas. Elegí un servicio para empezar.</p>')},
+ord:()=>{const o=ord();if(!o)return '<p class="sub">Orden no encontrada.</p>';
+ const r=S.me.role,i=EST.indexOf(o.estado);
+ let h=`<button class="back" data-a="go" data-v="${r==='cliente'?'ords':'pag'}">‹ Volver</button><h1>${esc(o.rubro)} · ${esc(r==='cliente'?o.prestadorNombre:o.clienteNombre)}</h1><p class="sub">${fmt(o.inicio)} · ${esc(o.direccion)}</p>`+(o.notas?`<p class="sub">Notas: ${esc(o.notas)}</p>`:'')+
+ `<span class="pill hold">Pago a coordinar con el prestador</span><h2>Seguimiento</h2><div class="card">`+(o.estado==='cancelada'?'<div class="step cur"><span class="dot"></span>Cancelada</div>':EST.map((e,k)=>`<div class="step ${k<i?'done':k===i?'cur':''}"><span class="dot"></span>${LBL[e]}</div>`).join(''))+'</div>';
+ if(r==='cliente'){
+  if(o.estado==='confirmada')h+='<button class="btn alt" data-a="cancel">Cancelar reserva</button>';
+  if(o.estado==='finalizada')h+='<button class="btn" data-a="close">Confirmar que el trabajo está bien</button>';
+  if(o.estado==='cerrada'){const rv=S.revs.find(x=>x.ordenId===o.id);
+   h+=rv?`<h2>Tu calificación</h2><p class="sg">${st(rv.estrellas)}</p>`:`<h2>Calificá el trabajo</h2><div class="stars">${[1,2,3,4,5].map(n=>`<button class="${(S.st||0)>=n?'on':''}" data-a="star" data-v="${n}" aria-label="${n} estrellas">★</button>`).join('')}</div><label class="fld"><textarea rows="2" data-m="rt" placeholder="Contanos cómo fue (opcional)" aria-label="Comentario">${esc(S.rt)}</textarea></label><button class="btn" data-a="sendrev">Enviar calificación</button>`}
+ }else if(i>=0&&i<3)h+=`<button class="btn" data-a="adv">Marcar: ${LBL[EST[i+1]]}</button>`;
+ return h;
+},
+pag:()=>{const p=S.mp||{},l=S.orders.filter(o=>o.estado!=='cancelada').sort((a,b)=>a.inicio<b.inicio?-1:1),a=avg(S.me.id);
+ return `<h1>Hola, ${esc(S.me.nombre)}</h1>`+(p.estado!=='aprobado'?`<div class="card"><b>${p.estado==='rechazado'?'Tu perfil no fue aprobado':'Tu perfil está en revisión'}</b><div class="sub">${p.estado==='rechazado'?'Escribinos para revisar los motivos.':'Cuando lo aprobemos vas a aparecer en el listado y vas a poder publicar turnos.'}</div></div>`:'')+
+ `<div class="s3"><div class="card"><span class="sub">En curso</span><b>${l.filter(o=>!['finalizada','cerrada'].includes(o.estado)).length}</b></div><div class="card"><span class="sub">Finalizados</span><b>${l.filter(o=>['finalizada','cerrada'].includes(o.estado)).length}</b></div><div class="card"><span class="sub">Calificación</span><b>${a?a.toFixed(1):'–'}</b></div></div><h2>Tus órdenes</h2>`+(l.length?l.map(ocard).join(''):'<p class="sub">Todavía no tenés reservas.</p>');
+},
+pturn:()=>{const ok=S.mp?.estado==='aprobado',l=S.myslots.slice().filter(s=>s.inicio>nowL()||s.estado==='reservado').sort((a,b)=>a.inicio<b.inicio?-1:1);
+ return '<h1>Mis turnos</h1>'+(ok?'':'<p class="sub">Vas a poder publicar turnos cuando aprobemos tu perfil.</p>')+`<div class="qg"><label class="fld"><input type="date" data-m="sd" value="${esc(S.sd)}" aria-label="Fecha"></label><label class="fld"><input type="time" data-m="stm" value="${esc(S.stm)}" aria-label="Hora"></label></div><button class="btn" data-a="addslot">Publicar turno</button><h2>Publicados</h2>`+
+ (l.length?l.map(s=>`<div class="card row"><span>${fmt(s.inicio)}</span><span>${s.estado==='libre'?`<span class="ok2">Libre</span> <button class="chip" data-a="delslot" data-id="${s.id}">Quitar</button>`:'<span class="wn">Reservado</span>'}</span></div>`).join(''):'<p class="sub">No tenés turnos publicados.</p>');
+},
+adm:()=>'<h1>Prestadores pendientes</h1>'+(S.pend.length?S.pend.map(p=>`<div class="card"><b>${esc(p.nombre)}</b><div class="sub">${esc(p.rubro)} · ${esc(p.zona)} · desde ${m(p.desde)}</div><p>${esc(p.desc)}</p><div class="qg"><button class="btn" data-a="appr" data-id="${p.id}">Aprobar</button><button class="btn alt" data-a="rej" data-id="${p.id}">Rechazar</button></div></div>`).join(''):'<p class="sub">No hay prestadores pendientes de revisión.</p>'),
+perfil:()=>`<h1>Perfil</h1><div class="card"><b>${esc(S.me.nombre)}</b><div class="sub">${esc(S.me.email)} · ${S.me.role}</div>${S.me.role==='prestador'&&S.mp?`<div class="sub">Perfil: ${S.mp.estado}</div>`:''}</div><button class="btn alt" data-a="out">Cerrar sesión</button>`
+};
+
+function drawSlots(){const el=$('#slots');if(!el)return;const n=nowL(),l=S.slots.filter(s=>s.estado==='libre'&&s.inicio>n).sort((a,b)=>a.inicio<b.inicio?-1:1);
+ el.innerHTML=l.length?l.map(s=>`<button class="chip ${S.sid===s.id?'on':''}" data-a="pick" data-id="${s.id}">${fmt(s.inicio)}</button>`).join(''):'<p class="sub">Este prestador no tiene turnos libres por ahora.</p>'}
+function render(){
+ const v=S.view,r=S.me?.role,n=r?NAV[r]:[];
+ $('header').innerHTML=LG+(r?'<button class="ib" data-a="out" style="font-size:14px;color:var(--tx2)">Salir</button>':'');
+ $('#main').innerHTML=V[v]();
+ if(v==='auth'||v==='perfil')$('#main').insertAdjacentHTML('afterbegin',inst());
+ const cur=v==='det'?'svc':v==='ord'?(r==='cliente'?'ords':'pag'):v;
+ const nv=$('#nav');nv.style.display=n.length?'grid':'none';nv.style.gridTemplateColumns=`repeat(${n.length||1},1fr)`;
+ nv.innerHTML=n.map(x=>`<button class="${x[0]===cur?'on':''}" data-a="go" data-v="${x[0]}"><span>${x[1]}</span>${x[2]}</button>`).join('');
+ if(S.last!==v){window.scrollTo(0,0);S.last=v}
+ if(v==='det')drawSlots();
+}
+
+async function loadPub(){
+ const a=await getDocs(query(collection(db,'prestadores'),where('estado','==','aprobado')));S.pres=a.docs.map(d=>({id:d.id,...d.data()}));
+ const r=await getDocs(collection(db,'resenas'));S.revs=r.docs.map(d=>d.data());
+ S.rat={};S.revs.forEach(x=>{(S.rat[x.prestadorId]??=[]).push(x.estrellas)});
+}
+async function loadPend(){const q=await getDocs(query(collection(db,'prestadores'),where('estado','==','pendiente')));S.pend=q.docs.map(d=>({id:d.id,...d.data()}))}
+function clean(){unsub.forEach(f=>f());unsub=[];if(unslots){unslots();unslots=null}}
+async function boot(u){
+ clean();
+ const sn=await getDoc(doc(db,'users',u.uid));
+ if(!sn.exists()){toast('Tu cuenta no tiene perfil. Registrate de nuevo con otro email.');await signOut(auth);return}
+ S.me={id:u.uid,...sn.data()};S.orders=[];S.myslots=[];S.mp=null;
+ const role=S.me.role;
+ if(role==='prestador'){
+  unsub.push(onSnapshot(doc(db,'prestadores',u.uid),d=>{S.mp=d.data();if(['pag','pturn','perfil'].includes(S.view))render()}));
+  unsub.push(onSnapshot(collection(db,'prestadores',u.uid,'turnos'),q=>{S.myslots=q.docs.map(d=>({id:d.id,...d.data()}));if(S.view==='pturn')render()}));
+ }
+ if(role!=='admin'){
+  const f=role==='cliente'?'clienteId':'prestadorId';
+  unsub.push(onSnapshot(query(collection(db,'ordenes'),where(f,'==',u.uid)),q=>{S.orders=q.docs.map(d=>({id:d.id,...d.data()}));if(['ords','ord','pag'].includes(S.view))render()}));
+ }
+ await loadPub();if(role==='admin')await loadPend();
+ go(HOME[role]);
+}
+
+let ip=null;
+const inst=()=>{
+ if(matchMedia('(display-mode: standalone)').matches||navigator.standalone)return '';
+ if(ip)return '<div class="card cf"><b>Instalá HomePro en tu celular</b><div class="sub">Se abre a pantalla completa, como una app.</div><button class="btn" data-a="instalar">Instalar</button></div>';
+ if(/iphone|ipad/i.test(navigator.userAgent))return '<div class="card cf"><b>Instalá HomePro en tu iPhone</b><div class="sub">Tocá Compartir y después «Agregar a pantalla de inicio».</div></div>';
+ return '';
+};
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();ip=e;if(['auth','perfil'].includes(S.view))render()});
+window.addEventListener('appinstalled',()=>{ip=null;if(['auth','perfil'].includes(S.view))render()});
+const A={
+async instalar(){if(!ip)return;ip.prompt();await ip.userChoice;ip=null;render()},
+tab:d=>{S.tab=d.v;render()},
+rol:d=>{S.rol=d.v;render()},
+rf:d=>{S.rf=S.rf===d.v?null:d.v;render()},
+go:async d=>{if(d.v==='svc')await loadPub();if(d.v==='adm')await loadPend();go(d.v)},
+async login(){try{await signInWithEmailAndPassword(auth,S.em||'',S.pw||'')}catch(e){toast(errMsg(e))}},
+async reset(){if(!S.em)return toast('Escribí tu email primero');try{await sendPasswordResetEmail(auth,S.em);toast('Te enviamos un email para restablecer la contraseña')}catch(e){toast(errMsg(e))}},
+async out(){await signOut(auth)},
+async reg(){
+ const p=S.rol==='prestador';
+ if(!S.nom?.trim()||!S.em?.trim()||(S.pw||'').length<6)return toast('Completá nombre, email y una contraseña de 6 o más caracteres');
+ if(p&&(!S.zona?.trim()||!(+S.desde>0)||!S.desc?.trim()))return toast('Completá zona, precio y descripción');
+ try{
+  S.booting=true;
+  const c=await createUserWithEmailAndPassword(auth,S.em.trim(),S.pw);
+  await setDoc(doc(db,'users',c.user.uid),{nombre:S.nom.trim(),email:S.em.trim(),role:S.rol,creadoEn:serverTimestamp()});
+  if(p)await setDoc(doc(db,'prestadores',c.user.uid),{nombre:S.nom.trim(),rubro:S.rub||RUB[0],zona:S.zona.trim(),desde:+S.desde,desc:S.desc.trim(),estado:'pendiente',creadoEn:serverTimestamp()});
+  S.booting=false;S.pw='';await boot(c.user);
+ }catch(e){S.booting=false;toast(errMsg(e))}
+},
+det:d=>{S.pid=d.id;S.sid=null;S.slots=[];if(unslots)unslots();unslots=onSnapshot(collection(db,'prestadores',d.id,'turnos'),q=>{S.slots=q.docs.map(x=>({id:x.id,...x.data()}));drawSlots()});go('det')},
+pick:d=>{S.sid=d.id;drawSlots()},
+async book(){
+ const p=S.pres.find(x=>x.id===S.pid),s=S.slots.find(x=>x.id===S.sid);
+ if(!s)return toast('Elegí un turno');if(!S.dir?.trim())return toast('Ingresá la dirección del trabajo');
+ try{
+  const oid=await runTransaction(db,async tx=>{
+   const sr=doc(db,'prestadores',p.id,'turnos',s.id),sn=await tx.get(sr);
+   if(!sn.exists()||sn.data().estado!=='libre')throw new Error('turno-ocupado');
+   const or=doc(collection(db,'ordenes'));
+   tx.set(or,{clienteId:S.me.id,clienteNombre:S.me.nombre,prestadorId:p.id,prestadorNombre:p.nombre,rubro:p.rubro,turnoId:s.id,inicio:s.inicio,direccion:S.dir.trim(),notas:(S.nt||'').trim(),desde:p.desde,estado:'confirmada',pago:'a coordinar',creadaEn:serverTimestamp(),actualizadaEn:serverTimestamp()});
+   tx.update(sr,{estado:'reservado',clienteId:S.me.id,ordenId:or.id});
+   return or.id;
+  });
+  if(unslots){unslots();unslots=null}
+  S.sid=null;S.nt='';toast('Reserva confirmada');go('ord',{oid})
+ }catch(e){toast(e.message==='turno-ocupado'?'Ese turno ya fue tomado. Elegí otro.':errMsg(e))}
+},
+ord:d=>{S.oid=d.id;S.st=0;S.rt='';go('ord')},
+async cancel(){const o=ord();try{const b=writeBatch(db);
+ b.update(doc(db,'ordenes',o.id),{estado:'cancelada',actualizadaEn:serverTimestamp()});
+ b.update(doc(db,'prestadores',o.prestadorId,'turnos',o.turnoId),{estado:'libre',clienteId:deleteField(),ordenId:deleteField()});
+ await b.commit();toast('Reserva cancelada')}catch(e){toast(errMsg(e))}},
+async adv(){const o=ord(),n=EST[EST.indexOf(o.estado)+1];try{await updateDoc(doc(db,'ordenes',o.id),{estado:n,actualizadaEn:serverTimestamp()})}catch(e){toast(errMsg(e))}},
+async close(){try{await updateDoc(doc(db,'ordenes',ord().id),{estado:'cerrada',actualizadaEn:serverTimestamp()})}catch(e){toast(errMsg(e))}},
+star:d=>{S.st=+d.v;render()},
+async sendrev(){const o=ord();if(!S.st)return toast('Elegí de 1 a 5 estrellas');
+ try{await setDoc(doc(db,'resenas',o.id),{ordenId:o.id,clienteId:S.me.id,prestadorId:o.prestadorId,estrellas:S.st,texto:(S.rt||'').trim(),creadaEn:serverTimestamp()});await loadPub();toast('¡Gracias por tu calificación!');render()}catch(e){toast(errMsg(e))}},
+async addslot(){
+ if(S.mp?.estado!=='aprobado')return toast('Primero tiene que aprobarse tu perfil');
+ if(!S.sd||!S.stm)return toast('Elegí fecha y hora');
+ const ini=S.sd+'T'+S.stm;if(ini<=nowL())return toast('Elegí un horario futuro');
+ if(S.myslots.some(s=>s.inicio===ini))return toast('Ya publicaste ese turno');
+ try{await addDoc(collection(db,'prestadores',S.me.id,'turnos'),{inicio:ini,estado:'libre',creadoEn:serverTimestamp()});toast('Turno publicado')}catch(e){toast(errMsg(e))}
+},
+async delslot(d){try{await deleteDoc(doc(db,'prestadores',S.me.id,'turnos',d.id))}catch(e){toast(errMsg(e))}},
+async appr(d){try{await updateDoc(doc(db,'prestadores',d.id),{estado:'aprobado'});await loadPend();render()}catch(e){toast(errMsg(e))}},
+async rej(d){try{await updateDoc(doc(db,'prestadores',d.id),{estado:'rechazado'});await loadPend();render()}catch(e){toast(errMsg(e))}}
+};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&A[b.dataset.a])A[b.dataset.a](b.dataset)});
+document.addEventListener('input',e=>{const k=e.target.dataset.m;if(k)S[k]=e.target.value});
+
+if(firebaseConfig.apiKey.startsWith('TU_')){S.view='setup';render()}
+else{
+ app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);
+ render();
+ onAuthStateChanged(auth,u=>{if(S.booting)return;if(u)boot(u);else{clean();S.me=null;S.orders=[];S.pw='';go('auth')}});
+}
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
