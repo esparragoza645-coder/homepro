@@ -190,10 +190,10 @@ const fmt=s=>new Date(s).toLocaleString('es-AR',{weekday:'short',day:'numeric',m
 const nowL=()=>new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);
 const st=n=>'★'.repeat(Math.round(n))+'☆'.repeat(5-Math.round(n));
 const EST=['confirmada','en_camino','en_ejecucion','finalizada','cerrada'];
-const LBL={confirmada:'Confirmada',en_camino:'Prestador en camino',en_ejecucion:'En ejecución',finalizada:'Trabajo finalizado',cerrada:'Cerrada',cancelada:'Cancelada'};
+const LBL={solicitada:'Buscando prestador',confirmada:'Confirmada',en_camino:'Prestador en camino',en_ejecucion:'En ejecución',finalizada:'Trabajo finalizado',cerrada:'Cerrada',cancelada:'Cancelada'};
 const RUB=['Plomería','Electricidad','Gas','Albañilería','Mantenimiento'];
 const rl=x=>x==='Gas'?'Gasista':x;
-const NAV={cliente:[['home','home','Inicio'],['ords','calendar','Reservas'],['perfil','user','Perfil']],prestador:[['pag','calendar','Agenda'],['pturn','clock','Turnos'],['perfil','user','Perfil']],admin:[['adm','check','Prestadores'],['perfil','user','Perfil']]};
+const NAV={cliente:[['home','home','Inicio'],['ords','calendar','Reservas'],['perfil','user','Perfil']],prestador:[['pag','calendar','Agenda'],['ped','list','Pedidos'],['perfil','user','Perfil']],admin:[['adm','check','Prestadores'],['perfil','user','Perfil']]};
 const HOME={cliente:'home',prestador:'pag',admin:'adm'};
 const LG='<span class="logo"><svg width="36" height="32" viewBox="0 0 34 30" aria-hidden="true"><path d="M17 2 2 14h4v13h22V14h4z" fill="#1E5BD8"/><rect x="11" y="16" width="12" height="11" rx="2" fill="#3DB36B"/></svg><span>HomePro<i>360</i></span></span>';
 const S={view:'load',tab:'login',rol:'cliente',orders:[],pres:[],revs:[],rat:{},pend:[],slots:[],myslots:[],me:null,mp:null};
@@ -204,7 +204,7 @@ let unsub=[],unslots=null,app,auth,db;
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2600)}
 function go(v,x){Object.assign(S,x||{});S.view=v;render()}
 
-const ocard=o=>`<button class="card" data-a="ord" data-id="${o.id}"><div class="row"><b>${esc(rl(o.rubro))} · ${esc(S.me.role==='cliente'?o.prestadorNombre:o.clienteNombre)}</b><span class="pill ${o.estado==='cerrada'?'rel':'hold'}">${LBL[o.estado]}</span></div><div class="sub">${fmt(o.inicio)} · ${esc(o.direccion)}</div></button>`;
+const ocard=o=>`<button class="card" data-a="ord" data-id="${o.id}"><div class="row"><b>${esc(rl(o.rubro))} · ${esc(S.me.role==='cliente'?(o.prestadorNombre||'Buscando prestador'):o.clienteNombre)}</b><span class="pill ${o.estado==='cerrada'?'rel':'hold'}">${LBL[o.estado]}</span></div><div class="sub">${fmt(o.inicio)} · ${esc(o.direccion)}</div></button>`;
 const fld=(k,ph,t)=>`<label class="fld"><input ${t?'type="'+t+'"':''} data-m="${k}" placeholder="${ph}" aria-label="${ph}" value="${esc(S[k])}"></label>`;
 
 const V={
@@ -231,10 +231,10 @@ det:()=>{const p=S.pres.find(x=>x.id===S.pid);if(!p)return '<p class="sub">Prest
 ords:()=>{const l=S.orders.slice().sort((a,b)=>a.inicio<b.inicio?1:-1);return '<h1>Agenda y reservas</h1>'+(l.length?l.map(ocard).join(''):'<p class="sub">Todavía no tenés reservas. Elegí un servicio para empezar.</p>')},
 ord:()=>{const o=ord();if(!o)return '<p class="sub">Orden no encontrada.</p>';
  const r=S.me.role,i=EST.indexOf(o.estado);
- let h=`<button class="back" data-a="go" data-v="${r==='cliente'?'ords':'pag'}">‹ Volver</button><h1>${esc(rl(o.rubro))} · ${esc(r==='cliente'?o.prestadorNombre:o.clienteNombre)}</h1><p class="sub">${fmt(o.inicio)} · ${esc(o.direccion)}</p>`+(o.notas?`<p class="sub">Notas: ${esc(o.notas)}</p>`:'')+
- `<span class="pill hold">Pago a coordinar con el prestador</span><h2>Seguimiento</h2><div class="card">`+(o.estado==='cancelada'?'<div class="step cur"><span class="dot"></span>Cancelada</div>':EST.map((e,k)=>`<div class="step ${k<i?'done':k===i?'cur':''}"><span class="dot"></span>${LBL[e]}</div>`).join(''))+'</div>';
+ let h=`<button class="back" data-a="go" data-v="${r==='cliente'?'ords':'pag'}">‹ Volver</button><h1>${esc(rl(o.rubro))} · ${esc(r==='cliente'?(o.prestadorNombre||'Buscando prestador'):o.clienteNombre)}</h1><p class="sub">${fmt(o.inicio)} · ${esc(o.direccion)}</p>`+(o.notas?`<p class="sub">Notas: ${esc(o.notas)}</p>`:'')+
+ `<span class="pill hold">Pago a coordinar con el prestador</span><h2>Seguimiento</h2><div class="card">`+(o.estado==='cancelada'?'<div class="step cur"><span class="dot"></span>Cancelada</div>':o.estado==='solicitada'?'<div class="step cur"><span class="dot"></span>Buscando un prestador disponible…</div>':EST.map((e,k)=>`<div class="step ${k<i?'done':k===i?'cur':''}"><span class="dot"></span>${LBL[e]}</div>`).join(''))+'</div>';
  if(r==='cliente'){
-  if(o.estado==='confirmada')h+='<button class="btn alt" data-a="cancel">Cancelar reserva</button>';
+  if(['confirmada','solicitada'].includes(o.estado))h+='<button class="btn alt" data-a="cancel">Cancelar reserva</button>';
   if(o.estado==='finalizada')h+='<button class="btn" data-a="close">Confirmar que el trabajo está bien</button>';
   if(o.estado==='cerrada'){const rv=S.revs.find(x=>x.ordenId===o.id);
    h+=rv?`<h2>Tu calificación</h2><p class="sg">${st(rv.estrellas)}</p>`:`<h2>Calificá el trabajo</h2><div class="stars">${[1,2,3,4,5].map(n=>`<button class="${(S.st||0)>=n?'on':''}" data-a="star" data-v="${n}" aria-label="${n} estrellas">★</button>`).join('')}</div><label class="fld"><textarea rows="2" data-m="rt" placeholder="Contanos cómo fue (opcional)" aria-label="Comentario">${esc(S.rt)}</textarea></label><button class="btn" data-a="sendrev">Enviar calificación</button>`}
@@ -276,24 +276,16 @@ ICS.bell='<path d="M12 2.5a6.5 6.5 0 0 0-6.5 6.5c0 6-2.5 8-2.5 8h18s-2.5-2-2.5-8
 IC.heart='<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z"/>';
 ICS.list='<path d="M4 6h2v2H4zm5 0h11v2H9zM4 11h2v2H4zm5 0h11v2H9zM4 16h2v2H4zm5 0h11v2H9z"/>';
 const nic=n=>`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${ICS[n]}</svg>`;
-function avb(p,solid){
- const n=nowL();
- if(!p.next)return `<span class="${solid?'gr':'av n'}">Sin turnos por ahora</span>`;
- const mins=(new Date(p.next)-new Date(n))/60000,d=p.next.slice(0,10),hoy=n.slice(0,10),man=new Date(Date.now()+864e5-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
- if(d===hoy&&mins<=60)return `<span class="${solid?'ok2':'av g'}">Disponible ahora</span>`;
- if(d===hoy)return `<span class="${solid?'wn':'av o'}">Disponible ${p.next.slice(11)}</span>`;
- if(d===man)return `<span class="${solid?'gr':'av n'}">Disponible mañana</span>`;
- return `<span class="${solid?'gr':'av n'}">Disponible ${p.next.slice(8,10)}/${p.next.slice(5,7)}</span>`;
-}
+function avb(p,solid){return p.disponible?`<span class="${solid?'ok2':'av g'}">Disponible ahora</span>`:`<span class="${solid?'gr':'av n'}">No disponible ahora</span>`}
 function svcList(){
  const q=(S.q||'').toLowerCase().trim(),n=nowL();
  let l=S.pres.filter(p=>(!S.rf||p.rubro===S.rf)&&(!S.fv||S.favs.includes(p.id))&&(!S.ur||(p.next&&(new Date(p.next)-new Date(n))/60000<=180))&&(!q||(p.nombre+' '+p.rubro+' '+p.zona).toLowerCase().includes(q)));
- l=l.slice().sort((a,b)=>S.pr?a.desde-b.desde:((a.next||'9')<(b.next||'9')?-1:1));
+ l=l.slice().sort((a,b)=>S.pr?a.desde-b.desde:(b.disponible?1:0)-(a.disponible?1:0));
  return l.length?l.map(pcard).join(''):'<p class="sub">No hay prestadores con esos filtros todavía.</p>';
 }
 function hdr(v,r){
  if(v==='svc')return `<button class="ib" data-a="${S.rf?'bcat':'back'}" data-v="home" aria-label="Volver">${ic('arrow')}</button>${LG}<span class="hr"></span>`;
- const back={det:'svc',bk:'det',ord:r==='cliente'?'ords':'pag',favs:'home',hist:'home'}[v];
+ const back={req:'svc',det:'svc',bk:'det',ord:r==='cliente'?'ords':'pag',favs:'home',hist:'home'}[v];
  if(v==='det'){const f=S.favs.includes(S.pid);return `<button class="ib" data-a="back" data-v="svc" aria-label="Volver">${ic('arrow')}</button>${LG}<span class="hr"><button class="ib" data-a="share" aria-label="Compartir">${ic('share')}</button><button class="ib" data-a="fav" aria-label="Favorito" style="color:#F5B301">${ic('star',24,f)}</button></span>`}
  if(back)return `<button class="ib" data-a="back" data-v="${back}" aria-label="Volver">${ic('arrow')}</button>${LG}<span class="hr"></span>`;
  return LG+`<span class="hr">${r?`<button class="ib" data-a="bell" aria-label="Notificaciones">${v==='home'?nic('bell'):ic('bell')}</button>${v==='home'?`<button class="ava" data-a="go" data-v="perfil" aria-label="Perfil">${esc(((S.me&&S.me.nombre)||'?')[0].toUpperCase())}</button>`:''}`:''}</span>`;
@@ -312,7 +304,6 @@ function render(){
 
 async function loadPub(){
  const a=await getDocs(query(collection(db,'prestadores'),where('estado','==','aprobado')));S.pres=a.docs.map(d=>({id:d.id,...d.data()}));
- await Promise.all(S.pres.map(async p=>{try{const q=await getDocs(collection(db,'prestadores',p.id,'turnos')),n=nowL();p.next=q.docs.map(d=>d.data()).filter(t=>t.estado==='libre'&&t.inicio>n).map(t=>t.inicio).sort()[0]||null}catch(e){p.next=null}}));
  const r=await getDocs(collection(db,'resenas'));S.revs=r.docs.map(d=>d.data());
  S.rat={};S.revs.forEach(x=>{(S.rat[x.prestadorId]??=[]).push(x.estrellas)});
 }
@@ -322,10 +313,12 @@ async function boot(u){
  clean();
  const sn=await getDoc(doc(db,'users',u.uid));
  if(!sn.exists()){toast('Tu cuenta no tiene perfil. Registrate de nuevo con otro email.');await signOut(auth);return}
- S.me={id:u.uid,...sn.data()};S.orders=[];S.myslots=[];S.mp=null;
+ S.me={id:u.uid,...sn.data()};S.orders=[];S.myslots=[];S.mp=null;S.open=[];S.sub=0;
  const role=S.me.role;
  if(role==='prestador'){
-  unsub.push(onSnapshot(doc(db,'prestadores',u.uid),d=>{S.mp=d.data();if(['pag','pturn','perfil'].includes(S.view))render()}));
+  unsub.push(onSnapshot(doc(db,'prestadores',u.uid),d=>{S.mp=d.data();
+   if(S.mp?.estado==='aprobado'&&!S.sub){S.sub=1;unsub.push(onSnapshot(query(collection(db,'ordenes'),where('estado','==','solicitada'),where('rubro','==',S.mp.rubro)),q=>{S.open=q.docs.map(x=>({id:x.id,...x.data()}));if(S.view==='ped')render()}))}
+   if(['pag','ped','perfil'].includes(S.view))render()}));
   unsub.push(onSnapshot(collection(db,'prestadores',u.uid,'turnos'),q=>{S.myslots=q.docs.map(d=>({id:d.id,...d.data()}));if(S.view==='pturn')render()}));
  }
  if(role!=='admin'){
@@ -346,12 +339,12 @@ V.home=()=>`<h2 class="hi">Hola, ${esc((S.me.nombre||'').split(' ')[0])} 👋</h
 V.svc=()=>{
  if(!S.rf)return `<h1>Servicios del hogar</h1><p class="sub" style="margin:-6px 0 14px">Elegí una categoría para ver prestadores y precios.</p><div class="cg">${RUB.map(r=>{const l=S.pres.filter(p=>p.rubro===r),c=l.length;return `<button class="ct" data-a="rub" data-v="${r}"><div class="ci">${wk(COL[r])}</div><b>${rl(r)}</b><small>${c?c+' prestador'+(c===1?'':'es')+' · desde '+m(Math.min(...l.map(p=>p.desde))):'Sin prestadores todavía'}</small></button>`}).join('')}</div>`;
  const l=S.pres.filter(p=>p.rubro===S.rf),ch=(on,v,t)=>`<button class="chip ${on?'on':''}" data-a="prs" data-v="${v}">${t}</button>`;
- return `<h1>${rl(S.rf)}</h1><p class="sub" style="margin:-6px 0 12px">${l.length?l.length+' prestador'+(l.length===1?'':'es')+' · visita desde '+m(Math.min(...l.map(p=>p.desde))):'Sin prestadores todavía'}</p><label class="fld sch">${ic('search',22)}<input data-m="q" placeholder="Buscar en ${rl(S.rf)}..." aria-label="Buscar" value="${esc(S.q)}"></label><div class="chips">${ch(!S.pr,'0','Disponibilidad')}${ch(S.pr,'1','Menor precio')}</div><div id="lst">${svcList()}</div>`};
+ return `<h1>${rl(S.rf)}</h1><p class="sub" style="margin:-6px 0 12px">${l.length?l.length+' prestador'+(l.length===1?'':'es')+' · visita desde '+m(Math.min(...l.map(p=>p.desde))):'Sin prestadores todavía'}</p><button class="btn" data-a="req" data-v="${S.rf}" style="margin:0 0 12px">Pedir ${rl(S.rf)} ahora</button><label class="fld sch">${ic('search',22)}<input data-m="q" placeholder="Buscar en ${rl(S.rf)}..." aria-label="Buscar" value="${esc(S.q)}"></label><div class="chips">${ch(!S.pr,'0','Disponibilidad')}${ch(S.pr,'1','Menor precio')}</div><div id="lst">${svcList()}</div>`};
 V.det=()=>{const p=S.pres.find(x=>x.id===S.pid);if(!p)return '<p class="sub">Prestador no encontrado.</p>';
  const rv=S.revs.filter(x=>x.prestadorId===p.id),a=avg(p.id);
  return `<div class="hero">${img(p)}</div><h1 style="margin:0 0 8px">${esc(p.nombre)}</h1>${avb(p,1)}<div class="pr"><b>Desde ${m(p.desde)}</b><span class="sub">· <span class="sg">${a?st(a):'☆☆☆☆☆'}</span> ${rv.length} opiniones</span></div><hr class="hl"><p>${esc(p.desc)}</p><button class="btn out" data-a="pf">Ver perfil del prestador</button>`+
  (S.pf?`<div class="card" style="margin-top:10px"><b>${esc(rl(p.rubro))}</b><div class="sub">${esc(p.zona)} · Perfil revisado y aprobado por HomePro</div></div>`:'')+
- `<h2>Turnos disponibles</h2><div id="slots"></div><button class="btn" data-a="tobk">Reservar ahora</button><p class="sub c">El pago se coordina directamente con el prestador. Pronto: pago seguro dentro de la app.</p><h2>Opiniones de clientes</h2>`+
+ `<button class="btn" data-a="req" data-v="${p.rubro}">Pedir ${esc(rl(p.rubro))}</button><p class="sub c">El pago se coordina directamente con el prestador. Pronto: pago seguro dentro de la app.</p><h2>Opiniones de clientes</h2>`+
  (rv.length?rv.map(r=>`<div class="rv"><span class="rav">${esc((r.texto||'★')[0].toUpperCase())}</span><div><span class="sg">${st(r.estrellas)}</span><div class="sub">${esc(r.texto)||'Sin comentario'}</div></div></div>`).join(''):'<p class="sub">Todavía no tiene opiniones.</p>')};
 V.bk=()=>{const p=S.pres.find(x=>x.id===S.pid),s=S.pick||{},done=!!S.conf;
  return `<h1>Confirmar reserva</h1><div class="card pc"><div class="th" style="width:96px">${img(p)}</div><div class="bd2"><b>${esc(p.nombre)}</b><div>${avb(p,1)}</div><div class="price" style="margin-top:4px">Desde ${m(p.desde)}</div></div></div><div class="qg"><div class="fld">${ic('calendar',20)}<span>Fecha</span><b>${s.inicio?fmtD(s.inicio):'–'}</b></div><div class="fld">${ic('clock',20)}<span>Hora</span><b>${s.inicio?s.inicio.slice(11):'–'}</b></div></div>`+
@@ -361,7 +354,11 @@ V.favs=()=>{const l=S.pres.filter(p=>S.favs.includes(p.id));return '<h1>Favorito
 V.hist=()=>{const l=S.orders.filter(o=>o.estado==='cerrada').sort((a,b)=>a.inicio<b.inicio?1:-1);return '<h1>Historial</h1>'+(l.length?l.map(ocard).join(''):'<p class="sub">Acá aparecen los trabajos que ya cerraste.</p>')};
 const oa=V.auth;V.auth=()=>oa().replace('<p class="sub">Revisamos','<label class="fld">${ic("note",20)}</label><p class="sub">Revisamos'.replace('<label class="fld">${ic("note",20)}</label>','<label class="fld"><span>Foto</span><input type="file" accept="image/*" id="foto" aria-label="Foto de tu servicio"></label>')+'');
 const op=V.perfil;V.perfil=()=>{let h=op();if(S.me.role==='prestador')h=h.replace('<button class="btn alt" data-a="out">',`<div class="card"><b>Foto de tu servicio</b><div class="hero" style="margin:10px 0;height:150px">${S.mp?img(S.mp):''}</div><label class="fld"><input type="file" accept="image/*" id="foto2" aria-label="Cambiar foto"></label></div><button class="btn alt" data-a="out">`);return h};
-const VER='versión 12 oct 2026 · categorías';
+V.req=()=>`<h1>Pedir ${esc(rl(S.rrub))}</h1><p class="sub" style="margin:-6px 0 12px">Se lo enviamos a los prestadores disponibles. El primero que acepte te confirma.</p><label class="fld">${ic('pin',20)}<input data-m="dir" placeholder="Dirección del trabajo" aria-label="Dirección" value="${esc(S.dir)}"></label><label class="fld">${ic('note',20)}<textarea rows="3" data-m="nt" placeholder="¿Qué necesitás? (opcional)" aria-label="Notas">${esc(S.nt)}</textarea></label><label class="fld"><input type="checkbox" id="urg" ${S.urg?'checked':''}><span style="color:var(--tx)">Es urgente</span></label><div class="card"><b>Pago</b><div class="sub">Se coordina directamente con el prestador.</div></div><button class="btn" data-a="send">Solicitar ahora</button>`;
+V.ped=()=>{const p=S.mp||{},ok=p.estado==='aprobado',on=!!p.disponible;
+ return '<h1>Pedidos</h1>'+(ok?`<div class="card row"><div><b>${on?'Estás disponible':'Estás fuera de línea'}</b><div class="sub">${on?'Recibís pedidos de '+esc(rl(p.rubro)):'Activate para ver pedidos'}</div></div><button class="chip ${on?'on':''}" data-a="disp">${on?'Disponible':'Activar'}</button></div>`:'<p class="sub">Vas a poder recibir pedidos cuando aprobemos tu perfil.</p>')+
+ (ok&&on?'<h2>Pedidos abiertos</h2>'+((S.open||[]).length?S.open.map(o=>`<div class="card"><div class="row"><b>${esc(rl(o.rubro))}</b>${o.urgente?'<span class="wn">Urgente</span>':''}</div><div class="sub" style="margin-top:6px">${ic('pin',16)} ${esc(o.direccion)}</div>${o.notas?`<div class="sub">${esc(o.notas)}</div>`:''}<button class="btn" data-a="accept" data-id="${o.id}">Aceptar pedido</button></div>`).join(''):'<p class="sub">No hay pedidos abiertos por ahora. Aparecen acá en cuanto entra uno.</p>'):'')};
+const VER='versión 12 oct 2026 · pedidos';
 V.pag=()=>{
  const p=S.mp||{},a=avg(S.me.id),hoy=nowL().slice(0,10),act=S.orders.filter(o=>o.estado!=='cancelada'),
   prox=act.filter(o=>!['finalizada','cerrada'].includes(o.estado)).sort((x,y)=>x.inicio<y.inicio?-1:1),nx=prox[0],
@@ -425,7 +422,7 @@ async book(){
 ord:d=>{S.oid=d.id;S.st=0;S.rt='';go('ord')},
 async cancel(){const o=ord();try{const b=writeBatch(db);
  b.update(doc(db,'ordenes',o.id),{estado:'cancelada',actualizadaEn:serverTimestamp()});
- b.update(doc(db,'prestadores',o.prestadorId,'turnos',o.turnoId),{estado:'libre',clienteId:deleteField(),ordenId:deleteField()});
+ if(o.turnoId)b.update(doc(db,'prestadores',o.prestadorId,'turnos',o.turnoId),{estado:'libre',clienteId:deleteField(),ordenId:deleteField()});
  await b.commit();toast('Reserva cancelada')}catch(e){toast(errMsg(e))}},
 async adv(){const o=ord(),n=EST[EST.indexOf(o.estado)+1];try{await updateDoc(doc(db,'ordenes',o.id),{estado:n,actualizadaEn:serverTimestamp()})}catch(e){toast(errMsg(e))}},
 async close(){try{await updateDoc(doc(db,'ordenes',ord().id),{estado:'cerrada',actualizadaEn:serverTimestamp()})}catch(e){toast(errMsg(e))}},
@@ -485,6 +482,7 @@ document.addEventListener('change',async e=>{
  const t=e.target;
  if(t.id==='sdia'){S.fd=t.value;S.sid=null;drawSlots()}
  else if(t.id==='shora')S.sid=t.value;
+ else if(t.id==='urg')S.urg=t.checked;
  else if((t.id==='foto'||t.id==='foto2')&&t.files[0]){
   try{const f=await readPhoto(t.files[0],720,400);
    if(t.id==='foto'){S.foto=f;toast('Foto cargada')}
@@ -492,6 +490,12 @@ document.addEventListener('change',async e=>{
   }catch(x){toast('No se pudo cargar la foto')}
  }
 });
+A.req=d=>{S.rrub=d.v;S.urg=false;go('req')};
+A.send=async()=>{if(!S.dir?.trim())return toast('Ingresá la dirección del trabajo');
+ try{const r=await addDoc(collection(db,'ordenes'),{clienteId:S.me.id,clienteNombre:S.me.nombre,prestadorId:'',prestadorNombre:'',rubro:S.rrub,inicio:nowL(),direccion:S.dir.trim(),notas:(S.nt||'').trim(),urgente:!!S.urg,estado:'solicitada',pago:'a coordinar',creadaEn:serverTimestamp(),actualizadaEn:serverTimestamp()});
+  S.nt='';S.urg=false;S.oid=r.id;S.st=0;S.rt='';toast('Pedido enviado');go('ord')}catch(e){toast(errMsg(e))}};
+A.disp=async()=>{try{await updateDoc(doc(db,'prestadores',S.me.id),{disponible:!S.mp?.disponible})}catch(e){toast(errMsg(e))}};
+A.accept=async d=>{try{await runTransaction(db,async tx=>{const r=doc(db,'ordenes',d.id),s=await tx.get(r);if(!s.exists()||s.data().estado!=='solicitada')throw new Error('tomado');tx.update(r,{estado:'confirmada',prestadorId:S.me.id,prestadorNombre:S.me.nombre,actualizadaEn:serverTimestamp()})});toast('Pedido aceptado');go('pag')}catch(e){toast(e.message==='tomado'?'Otro prestador ya tomó ese pedido':errMsg(e))}};
 A.urc=()=>{S.ur=!S.ur;render()};
 A.advn=async d=>{S.oid=d.id;await A.adv()};
 A.bell=()=>toast('Todavía no tenés notificaciones. Pronto vas a recibir avisos de tus reservas.');
