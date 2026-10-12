@@ -1,5 +1,5 @@
 // Service worker de HomePro360. Cambiá el número de versión cuando modifiques íconos o manifiesto.
-const V = 'homepro-v1';
+const V = 'homepro-v2';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', e => {
